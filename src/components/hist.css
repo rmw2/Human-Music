@@ -1,0 +1,23 @@
+#chart-main {
+  display: flex;
+}
+
+#legend {
+  width: 15em;
+}
+
+#chart {
+
+}
+
+button.ctrl-btn {
+  padding: 0.25em 0.5em;
+  border-radius: 0.25em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button.artist {
+  display: block;
+  width: 100%;
+}

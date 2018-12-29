@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@data-ui/histogram": "0.0.74",
+    "@vx/annotation": "0.0.182",
+    "@vx/axis": "0.0.182",
+    "@vx/curve": "0.0.182",
+    "@vx/group": "0.0.182",
+    "@vx/scale": "0.0.182",
+    "@vx/shape": "0.0.182",
+    "d3-array": "^2.0.2",
+    "distinct-colors": "^1.0.4",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-scripts": "2.1.1"
