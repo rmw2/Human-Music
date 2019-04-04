@@ -1,20 +1,51 @@
-#chart-main {
-  display: flex;
+#chart-box {
+  display: grid;
+
+  grid-template-columns: 
+    [legend-left] 15em [legend-right chart-left controls-left] 1fr [chart-right controls-right];
+  grid-template-rows: 
+    [legend-top chart-top] 1fr 
+    [chart-bottom controls-top] 5em 
+    [controls-bottom legend-bottom];
+
+  height: 100vh;
+  align-items: center;
+  grid-gap: 0.5em;
+  padding: 0.5em;
 }
 
 #legend {
-  width: 15em;
+  grid-column: legend-left / legend-right;
+  grid-row: legend-top / legend-bottom;
 }
 
 #chart {
+  grid-column: chart-left / chart-right;
+  grid-row: chart-top / chart-bottom;
+}
 
+#controls {
+  grid-column: controls-left / controls-right;
+  grid-row: controls-top / controls-bottom;
+  text-align: center;
+}
+
+#controls > * {
+  margin: 0.5em;
 }
 
 button.ctrl-btn {
   padding: 0.25em 0.5em;
+  margin: 0 0.25em;
   border-radius: 0.25em;
+  border: 1px solid;
   font-weight: bold;
+  background-color: #fff;
   cursor: pointer;
+}
+
+button.ctrl-btn.selected {
+  background-color: #ccccff;
 }
 
 button.artist {
