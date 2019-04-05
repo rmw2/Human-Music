@@ -22,6 +22,7 @@
 #chart {
   grid-column: chart-left / chart-right;
   grid-row: chart-top / chart-bottom;
+  align-self: stretch;
 }
 
 #controls {

@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 
 // Prebuilt scale, axis, and SVG group components
-import { AxisBottom } from '@vx/axis'
 import { scaleTime } from '@vx/scale'
-import { Group } from '@vx/group'
 
 // D3 utilities, for curve interpolation and histogram creation
 import { curveMonotoneX } from 'd3-shape'
@@ -76,7 +74,7 @@ export class TimestampHistogram extends Component {
 
     this.state = {
       nbins: 40,
-      offset: 'expand',
+      offset: 'wiggle',
       selected
     }
 
@@ -127,7 +125,6 @@ export class TimestampHistogram extends Component {
   }
 
   render() {
-    const { width, height } = this.props
     const { nbins, offset, bins, selected} = this.state
 
     // Don't attempt to render an empty graph
@@ -142,27 +139,15 @@ export class TimestampHistogram extends Component {
       <div id="chart-box">
         <ArtistLegend selected={selected} toggle={this.toggleSelected} names={this.names} />
         <div id="chart" className="scroll-wrapper">
-          <svg width={width} height={height}>
-            <Group top={MARGIN.top} left={MARGIN.left}>
-              {/*<AxisLeft
-                label="Frequency" 
-                scale={this.yScale}
-                top={0} 
-                left={0} />*/}
-              <AxisBottom
-                label="Time"
-                scale={this.xScale}
-                top={this.yMax} />
-              <StackChart
-                data={bins}
-                keys={selectedArtists}
-                curve={curveMonotoneX} 
-                color={selectedColors}
-                offset={offset}
-                x={this.xScale} 
-                yMax={this.yMax} />
-            </Group>
-          </svg>
+          <StackChart
+            data={bins}
+            keys={selectedArtists}
+            curve={curveMonotoneX} 
+            color={selectedColors}
+            offset={offset}
+            margin={MARGIN}
+            x={this.xScale} 
+            yMax={this.yMax} />
         </div>
         <HistControls 
           updateOffset={type => this.setState({offset: type})}
@@ -207,7 +192,7 @@ const ArtistLegend = ({names, selected, toggle}) => (
  * @param   {Function}  updateOffset
  * @returns {React.Component}
  */
-const HistControls = ({nbins, offset, updateBins, updateOffset}) => (
+const HistControls = ({nbins, updateBins}) => (
   <div id="controls">
     <div id="granularity">
       <label>Granularity: {nbins}</label>
@@ -217,15 +202,6 @@ const HistControls = ({nbins, offset, updateBins, updateOffset}) => (
         max="100"
         value={nbins}
         onChange={({target: {value}}) => updateBins(parseInt(value))} />
-    </div>
-    <div>
-      {['none', 'silhouette', 'wiggle', 'expand'].map(type => 
-        <button 
-          className={type === offset ? 'ctrl-btn selected' : 'ctrl-btn'} 
-          onClick={() => updateOffset(type)}>
-          {type}
-        </button>
-      )}
     </div>
   </div>
 )

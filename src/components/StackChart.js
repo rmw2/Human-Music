@@ -1,4 +1,7 @@
 import React, { Component } from 'react'
+
+import { Group } from '@vx/group'
+import { AxisBottom } from '@vx/axis'
 import { scaleLinear } from '@vx/scale'
 import Snap from 'snapsvg'
 import { 
@@ -11,9 +14,8 @@ import {
   stackOffsetNone 
 } from 'd3-shape'
 
-import './draw.css'
-console.log('Snap:', Snap)
-const mina = {}
+import ResponsiveSVG from './ResponsiveSVG'
+import './StackChart.css'
 
 /**
  * @module StackChart
@@ -32,8 +34,14 @@ const OFFSET = {
 }
 
 export default class StackChart extends Component {
+  state = {
+    offset: 'silhouette'
+  }
+
   render() {
-    const {x, yMax, color, keys, curve, data, offset = 'expand', ...rest} = this.props
+    const { x, yMax, color, keys, curve, data, margin, ...rest } = this.props
+    const { offset } = this.state
+
     const stacks = stack().keys(keys).offset(OFFSET[offset])(data)
     const N = stacks.length - 1
 
@@ -54,23 +62,56 @@ export default class StackChart extends Component {
       .y1(d => y(d[1]))
 
     return (
-      <g>
-        {stacks.map((series, i) => 
-          <MorphPath 
-            key={keys[i]} 
-            d={path(series)} 
-            fill={color[i]} 
-            stroke="#fff" 
-            {...rest} />
-        )}
-      </g>
+      <div id="stackchart">
+        <StackControls updateOffset={offset => this.setState({offset})} />
+        <div id="stackchart-wrapper">
+          <ResponsiveSVG>
+            <Group>
+              {/*<AxisLeft
+                label="Frequency" 
+                scale={this.yScale}
+                top={0} 
+                left={0} />*/}
+              {stacks.map((series, i) => 
+                <MorphPath 
+                  key={keys[i]} 
+                  d={path(series)} 
+                  fill={color[i]} 
+                  {...rest} />
+              )}
+              <AxisBottom
+                label="Time"
+                scale={x}
+                top={yMax} />
+            </Group>
+          </ResponsiveSVG>
+        </div>
+      </div>
     ) 
   }
 }
 
 /**
+ * A set of buttons to control the offset mode of the 
+ * @param {Object} props 
+ */
+const StackControls = ({updateOffset, offset}) => (
+  <div id="stackchart-controls">
+    {Object.keys(OFFSET).map(type => 
+      <button 
+        key={type}
+        className={type === offset ? 'ctrl-btn selected' : 'ctrl-btn'} 
+        onClick={() => updateOffset(type)}>
+        {type}
+      </button>
+    )}
+  </div>
+)
+
+/**
  * @classdesc
  * A utility component for managing animated transitions between svg paths.
+ * Each MorphPath wraps a single <path> element, animating three a
  */
 class MorphPath extends Component {
   constructor(props) {
@@ -91,26 +132,27 @@ class MorphPath extends Component {
     const { curr } = this.state
     const $el = Snap(path)
 
-    $el.animate({d: curr}, 500, mina.easein, 
+    $el.animate({d: curr}, 250, null, 
       () => this.setState({ prev: curr }))
   }
 
   /**
-   * Compare new props with existing state to determine if the component should
-   * update or if any state should be changed.
-   * 
-   * TODO: figure out if this is where this should happen
+   * Compare new path with existing curr to determine if a transition animation should
+   * be fired; i.e. if the new `d` is distinct from `curr`.
    */
-  componentWillReceiveProps() {
-
+  componentWillReceiveProps({d}) {
+    const { curr } = this.state
+    if (d !== curr) {
+      this.setState({
+        prev: curr,
+        curr: d
+      })
+    }
   }
 
   render() {
     const { curr, prev } = this.state
     const { d, ...rest } = this.props
-
-    console.log('CURR', curr)
-    console.log('PREV', prev)
 
     if (!prev) {
       // Draw the path for the first time, incrementally using {path}
@@ -130,71 +172,3 @@ class MorphPath extends Component {
     }
   }
 }
-
-// export default class StackChart extends Component {
-//   state = {
-//     data: null,
-//     previousCurves: null,
-//     currentCurves: null
-//   }
-
-//   /**
-//    * Set up the endpoints for the transition
-//    */
-//   componentWillReceiveProps() {
-//     const stacks = stack().keys(keys).offset(OFFSET[offset])(data)
-//     const N = stacks.length - 1
-
-//     // Calculate the full extent of y's domain to scale the chart to fit
-//     // Use the fact that the stacks are already sorted to save computation
-//     const lo = stacks[0].reduce((lo, [next, _]) => next < lo ? next : lo, 0)
-//     const hi = stacks[N].reduce((hi, [_, next]) => next > hi ? next : hi, 1)
-
-//     const y = scaleLinear({
-//       range: [yMax, 0],
-//       domain: [lo, hi]
-//     })
-
-//     const path = area()
-//       .curve(curve)
-//       .x(d => x(d.data._date))
-//       .y0(d => y(d[0]))
-//       .y1(d => y(d[1]))
-
-//     // Pregenerate from and to
-//     if (data !== this.state.data) {
-//       this.setState({
-//         data,
-//         currentCurves: stacks.map((series, i) => 
-//           <path key={keys[i]} d={path(series)} fill={color[i]} stroke="#fff" {...rest} />),
-//         previousCurves: this.state.currentCurves,
-//       })
-//     }
-//   }
-
-//   updateData() {
-
-//   }
-
-//   updateCurve({x, y, curve}) {
-    
-//   }
-
-//   render() {
-//     const { previousCurves, currentCurves } = this.state
-
-//     return  (
-//       <g>
-//         {previousCurves ? currentCurves.map((_, i) => 
-//           <Motion style={{t: spring(10)}}>
-//             {({t}) =>
-//               <MorphTransition progress={t} rotation="none">
-//                 {{from: previousCurves[i], to: currentCurves[i]}}
-//               </MorphTransition>
-//             }
-//           </Motion>
-//         ) : currentCurves}
-//       </g>
-//     )
-//   }
-// }

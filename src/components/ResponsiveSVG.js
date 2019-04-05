@@ -15,11 +15,14 @@ const debounce = (func, delay) => {
  * An svg which adapts to the parent size
  */
 export default class ResponsiveSVG extends Component {
-  svg = React.createRef()
-
   state = {
-    width: null,
-    height: null,
+    width: 1,
+    height: 1,
+  }
+
+  constructor(props) {
+    super(props)
+    this.updateSize = this.updateSize.bind(this)
   }
 
   componentDidMount() {
@@ -32,16 +35,18 @@ export default class ResponsiveSVG extends Component {
   }
 
   updateSize() {
-    const {width, height} = this.svg.parentNode.getBoundingClientRect()
-    this.setState({width, height})
+    if (this.svg) {
+      const {width, height} = this.svg.parentNode.getBoundingClientRect()
+      this.setState({width, height})
+    }
   }
 
   render() {
     const {children} = this.props
-    const {width, height} = this.state
+    const { width, height } = this.state
 
     return width ? (
-      <svg ref={this.svg} width={width} height={height}>
+      <svg ref={svg => this.svg = svg} width={width} height={height}>
         {children}
       </svg>
     ) : null
