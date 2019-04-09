@@ -2,13 +2,13 @@
   display: grid;
 
   grid-template-columns: 
-    [legend-left] 15em [legend-right chart-left controls-left] 1fr [chart-right controls-right];
+    [legend-left chart-left controls-left] 1fr [legend-right chart-right controls-right];
   grid-template-rows: 
-    [legend-top chart-top] 1fr 
+    [chart-top] 1fr 
     [chart-bottom controls-top] 5em 
-    [controls-bottom legend-bottom];
+    [controls-bottom legend-top] 1fr
+    [legend-bottom];
 
-  height: 100vh;
   align-items: center;
   grid-gap: 0.5em;
   padding: 0.5em;
@@ -17,6 +17,7 @@
 #legend {
   grid-column: legend-left / legend-right;
   grid-row: legend-top / legend-bottom;
+  column-count: 3;
 }
 
 #chart {
@@ -35,21 +36,7 @@
   margin: 0.5em;
 }
 
-button.ctrl-btn {
-  padding: 0.25em 0.5em;
-  margin: 0 0.25em;
-  border-radius: 0.25em;
-  border: 1px solid;
-  font-weight: bold;
-  background-color: #fff;
-  cursor: pointer;
-}
-
-button.ctrl-btn.selected {
-  background-color: #ccccff;
-}
 
 button.artist {
   display: block;
-  width: 100%;
 }

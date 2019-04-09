@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
 
-// Prebuilt scale, axis, and SVG group components
-import { scaleTime } from '@vx/scale'
-
 // D3 utilities, for curve interpolation and histogram creation
 import { curveMonotoneX } from 'd3-shape'
 import { histogram, extent } from 'd3-array'
@@ -30,13 +27,6 @@ const COLORS = distinctColors({
   chromaMax: 40,
 })
 
-// Margins for the inner SVG group, holding the histogram
-const MARGIN = {
-  top: 60,
-  bottom: 60,
-  left: 30,
-  right: 30,
-}
 
 /**
  * @classdesc
@@ -46,18 +36,9 @@ const MARGIN = {
 export class TimestampHistogram extends Component {
   constructor(props) {
     super(props)
-    const { all, width, height, byArtist } = props
-    
-    const { left, right, bottom, top } = MARGIN
-
-    this.xMax = width - (left + right)
-    this.yMax = height - (top + bottom)
-
-    // Create histogram scale for all plots
-    this.xScale = scaleTime({
-      range: [0, this.xMax],
-      domain: extent(all, d => new Date(1000*d))
-    })
+    const { all, byArtist } = props
+  
+    this.domain = extent(all, d => new Date(1000*d))
 
     // Sort and select the top N_ARTISTS for the graph
     this.allArtists = Object.entries(byArtist)
@@ -98,8 +79,8 @@ export class TimestampHistogram extends Component {
   updateBins(nbins=this.state.nbins) {
     // Create the histogram, mapping an array of dates to a set of nbins bins
     const hist = histogram()
-      .domain(this.xScale.domain())
-      .thresholds(timeTicks(this.xScale.domain(), nbins))
+      .domain(this.domain)
+      .thresholds(timeTicks(this.domain, nbins))
 
     // Map to an object of binned plays indexed by artist
     const artists = this.allArtists
@@ -137,18 +118,17 @@ export class TimestampHistogram extends Component {
 
     return (
       <div id="chart-box">
-        <ArtistLegend selected={selected} toggle={this.toggleSelected} names={this.names} />
-        <div id="chart" className="scroll-wrapper">
-          <StackChart
-            data={bins}
-            keys={selectedArtists}
-            curve={curveMonotoneX} 
-            color={selectedColors}
-            offset={offset}
-            margin={MARGIN}
-            x={this.xScale} 
-            yMax={this.yMax} />
-        </div>
+        <ArtistLegend 
+          selected={selected} 
+          toggle={this.toggleSelected} 
+          names={this.names} />
+        <StackChart
+          data={bins}
+          keys={selectedArtists}
+          curve={curveMonotoneX} 
+          color={selectedColors}
+          offset={offset}
+          domain={this.domain} />
         <HistControls 
           updateOffset={type => this.setState({offset: type})}
           updateBins={this.updateBins}

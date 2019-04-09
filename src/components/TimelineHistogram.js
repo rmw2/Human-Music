@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 
-function histifiy(hist) {
-    // Create the histogram, mapping an array of dates to a set of nbins bins
-    const hist = histogram()
-      .domain(this.xScale.domain())
-      .thresholds(timeTicks(this.xScale.domain(), nbins))
+// Create the histogram, mapping an array of dates to a set of nbins bins
+const hist = histogram()
+  .domain(this.xScale.domain())
+  .thresholds(timeTicks(this.xScale.domain(), nbins))
 
+function histifiy(hist, data) {
     // Map to an object of binned plays indexed by artist
     const artists = this.allArtists
       .map(([name, {timestamps}]) => ({[name]: hist(timestamps.map(fromTimestamp))}))
       .reduce((obj, item) => Object.assign(obj, item), {})
+      
 
     // Reshape from an object of lists to a list of objects
     const bins = hist([])

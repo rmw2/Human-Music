@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 
+// Prebuilt scale, axis, and SVG group components
 import { Group } from '@vx/group'
 import { AxisBottom } from '@vx/axis'
-import { scaleLinear } from '@vx/scale'
+import { scaleLinear, scaleTime } from '@vx/scale'
+
 import Snap from 'snapsvg'
 import { 
   area, 
   stack, 
-  stackOffsetDiverging, 
   stackOffsetExpand, 
   stackOffsetWiggle, 
   stackOffsetSilhouette, 
@@ -26,21 +27,29 @@ import './StackChart.css'
  */
 
 const OFFSET = {
-  wiggle: stackOffsetWiggle,
-  expand: stackOffsetExpand,
-  diverging: stackOffsetDiverging,
+  stack: stackOffsetNone,
+  normalize: stackOffsetExpand,
+  stream: stackOffsetWiggle,
   silhouette: stackOffsetSilhouette,
-  none: stackOffsetNone
+  overlap: null
+}
+
+// Margins for the inner SVG group, holding the stack
+const MARGIN = {
+  top: 60,
+  bottom: 60,
+  left: 30,
+  right: 30,
 }
 
 export default class StackChart extends Component {
   state = {
-    offset: 'silhouette'
+    offset: 'stream'
   }
 
   render() {
-    const { x, yMax, color, keys, curve, data, margin, ...rest } = this.props
-    const { offset } = this.state
+    const { domain, color, keys, curve, data, ...rest } = this.props
+    const { offset, height, width } = this.state
 
     const stacks = stack().keys(keys).offset(OFFSET[offset])(data)
     const N = stacks.length - 1
@@ -50,9 +59,19 @@ export default class StackChart extends Component {
     const lo = stacks[0].reduce((lo, [next, _]) => next < lo ? next : lo, 0)
     const hi = stacks[N].reduce((hi, [_, next]) => next > hi ? next : hi, 1)
 
+    const { left, right, bottom, top } = MARGIN
+
+    const xMax = width - (left + right)
+    const yMax = height - (top + bottom)
+
+    const x = scaleTime({
+      domain,
+      range: [0, xMax],
+    })
+
     const y = scaleLinear({
+      domain: [lo, hi],
       range: [yMax, 0],
-      domain: [lo, hi]
     })
 
     const path = area()
@@ -65,7 +84,7 @@ export default class StackChart extends Component {
       <div id="stackchart">
         <StackControls updateOffset={offset => this.setState({offset})} />
         <div id="stackchart-wrapper">
-          <ResponsiveSVG>
+          <ResponsiveSVG onUpdate={(width, height) => this.setState({width, height})}>
             <Group>
               {/*<AxisLeft
                 label="Frequency" 

@@ -49,3 +49,16 @@ path.path-stable, path.path-morph {
   stroke: #fff;
 }
 
+button.ctrl-btn {
+  padding: 0.25em 0.5em;
+  margin: 0 0.25em;
+  border-radius: 0.25em;
+  border: 1px solid;
+  font-weight: bold;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+button.ctrl-btn.selected {
+  background-color: #ccccff;
+}

@@ -38,6 +38,9 @@ export default class ResponsiveSVG extends Component {
     if (this.svg) {
       const {width, height} = this.svg.parentNode.getBoundingClientRect()
       this.setState({width, height})
+
+      // HOOK BACK TO PASS SIZE TO PARENT.  MAYBE THIS SHOULD BE LIFTED UP SOMEHOW
+      this.props.onUpdate(width, height)
     }
   }
 
