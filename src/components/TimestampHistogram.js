@@ -13,7 +13,7 @@ import StackChart from './StackChart'
 import './hist.css'
 
 // The max number of artists to display
-const N_ARTISTS = 30
+const N_ARTISTS = 24
 
 // The initial number of artists to display
 const N_SHOW = 15
@@ -159,7 +159,11 @@ const ArtistLegend = ({names, selected, toggle}) => (
           borderColor: COLORS[i],
           color: selected[name] ? 'white' : COLORS[i],
           fontWeight: 'bold'
-      }}>{name}</button>
+        }}>
+        <span className="rank">({i+1})</span>
+        {name}
+        <span className="x">{selected[name] ? 'x' : '+'}</span>
+      </button>
     )}
   </div>
 )

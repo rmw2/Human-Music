@@ -4,8 +4,8 @@
   grid-template-columns: 
     [legend-left chart-left controls-left] 1fr [legend-right chart-right controls-right];
   grid-template-rows: 
-    [chart-top] 1fr 
-    [chart-bottom controls-top] 5em 
+    [chart-top] 60vh 
+    [chart-bottom controls-top] 3em 
     [controls-bottom legend-top] 1fr
     [legend-bottom];
 
@@ -17,7 +17,8 @@
 #legend {
   grid-column: legend-left / legend-right;
   grid-row: legend-top / legend-bottom;
-  column-count: 3;
+  column-count: 4;
+  text-align: center;
 }
 
 #chart {
@@ -39,4 +40,13 @@
 
 button.artist {
   display: block;
+  min-width: 20em;
+}
+
+button.artist > span.rank {
+  float: left;
+}
+
+button.artist > span.x {
+  float: right;
 }

@@ -16,8 +16,8 @@ const debounce = (func, delay) => {
  */
 export default class ResponsiveSVG extends Component {
   state = {
-    width: 1,
-    height: 1,
+    width: 0,
+    height: 0,
   }
 
   constructor(props) {
@@ -37,8 +37,8 @@ export default class ResponsiveSVG extends Component {
   updateSize() {
     if (this.svg) {
       const {width, height} = this.svg.parentNode.getBoundingClientRect()
-      this.setState({width, height})
 
+      this.setState({width, height})
       // HOOK BACK TO PASS SIZE TO PARENT.  MAYBE THIS SHOULD BE LIFTED UP SOMEHOW
       this.props.onUpdate(width, height)
     }
@@ -48,10 +48,17 @@ export default class ResponsiveSVG extends Component {
     const {children} = this.props
     const { width, height } = this.state
 
+    /**
+     * Render a dummy div if width is not specified, calculate width & height
+     * and re-render with SVG.  This allows SVG to mount at the proper side,
+     * enabling entrance animations at scale.
+     */
     return width ? (
       <svg ref={svg => this.svg = svg} width={width} height={height}>
         {children}
       </svg>
-    ) : null
+    ) : (
+      <div id="svg-dummy" ref={div => this.svg = div}></div>
+    )
   }
 }

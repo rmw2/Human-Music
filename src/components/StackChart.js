@@ -36,10 +36,10 @@ const OFFSET = {
 
 // Margins for the inner SVG group, holding the stack
 const MARGIN = {
-  top: 60,
-  bottom: 60,
-  left: 30,
-  right: 30,
+  top: 5,
+  bottom: 5,
+  left: 5,
+  right: 5,
 }
 
 export default class StackChart extends Component {
